@@ -20,7 +20,6 @@ class Test:
 	left_name = 'left'
 	right_name = 'right'
 	divider = '\n' + '=' * 20 + '\n'
-	
 
 	def __init__(self, **kwargs):
 		for key, value in kwargs:
@@ -35,10 +34,10 @@ class Test:
 
 	@property
 	def id(self):
-	    return self._id or self.__class__.__name__
+		return self._id or self.__class__.__name__
 	@id.setter
 	def id(self, value):
-	    self._id = value
+		self._id = value
 
 	def failed_file_name(self, left_or_right):
 		suffix = self.left_name if left_or_right == 'left' else self.right_name
@@ -116,14 +115,14 @@ class Test:
 		pass
 		
 	def _assert_op(self, left, right, op):
-		self.frame_depth = 2
+		self.frame_depth = 4
 		self._assert_eval('left ' + op + ' right', left, right)
 
 	def _assert_eval(self, code, left, right):
 		self.code = code
 		self.left = left
 		self.right = right
-		self.frame_depth += 1
+		self.frame_depth = 4
 
 		locals()[self.left_name] = left
 		locals()[self.right_name] = right
@@ -138,13 +137,13 @@ class Test:
 		# function call so left_name and right_name may be reversed, but it will 
 		# only change which is listed first in the failure output
 		items = list(kwargs.items())
+
 		try:
 			self.left_name, left = items[0]
 			self.right_name, right = items[1]
 		except IndexError:
 			raise TypeError('assert_code takes 1 positional argument and 2 keyword arguments')
 
-		self.frame_depth = 1
 		self._assert_eval(code, left, right)
 
 	def assert_lt(self, left, right):
@@ -174,11 +173,9 @@ class Test:
 	def assert_len(self, item, length):
 		self.left_name = 'item'
 		self.right_name = 'length'
-		self.frame_depth = 1
 		self._assert_eval('len(item) == length', item, length)
 
 	def assert_instance(self, instance, cls):
 		self.left_name = 'instance'
 		self.right_name = 'cls'
-		self.frame_depth = 1
 		self._assert_eval('isinstance(instance, cls)', instance, cls)
