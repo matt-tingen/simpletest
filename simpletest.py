@@ -3,6 +3,7 @@ import inspect
 from datetime import datetime
 import os
 from pprint import pprint
+import textwrap
 
 
 class TestFailed(Exception):
@@ -20,6 +21,8 @@ class Test:
     left_name = 'left'
     right_name = 'right'
     separator = '\n' + '=' * 20 + '\n'
+    context_marker = '-> '
+    context_divider = ': '
 
     def __init__(self, **kwargs):
         for key, value in kwargs:
@@ -75,8 +78,33 @@ class Test:
         adjusted_line_num = self.line_num - start_line_num
         start = max(0, adjusted_line_num - self.context_lines_before)
         end = min(len(context), adjusted_line_num + self.context_lines_after + 1)
+        self.context = ''.join(context[start:end]).rstrip()
+        self.format_context()
 
-        self.context = ''.join(context[start:end])
+    def format_context(self):
+        # Determine how much space will be needed to the left of each line.
+        # We must accomodate the line numbers, plus the line marker where the assertion failed,
+        # and the divider that separates the line number from the code.
+        line_num_width = len(str(self.line_num + self.context_lines_after + 1))
+        padding_width = line_num_width + len(self.context_marker + self.context_divider)
+
+        # Add line numbers, the line marker, and dividers to the beginning of lines.
+        unindented = textwrap.dedent(self.context)
+        line_num = self.line_num - self.context_lines_before
+        lines = []
+
+        for line in unindented.split('\n'):
+            prefix = '{marker:>{marker_width}}{num:{num_width}}{div}'.format(
+                marker = self.context_marker if line_num == self.line_num else '',
+                marker_width = len(self.context_marker),
+                num = line_num,
+                num_width = line_num_width,
+                div = self.context_divider
+            )
+            lines.append('{:>{width}}{}'.format(prefix, line, width=padding_width))
+            line_num += 1
+
+        self.context = '\n'.join(lines)
 
     def success(self):
         pass
@@ -106,10 +134,14 @@ class Test:
 
         print('\n{}:'.format(self.left_name))
         pretty_print(self.left)
+
         print(self.separator)
+
         print('{}:'.format(self.right_name))
         pretty_print(self.right)
+
         print(self.separator)
+
         print('Expected: ' + self.code)
         print('Test "{}" failed on line {} of\n{}:'.format(self.id, self.line_num, self.filename))
         print(self.context)
