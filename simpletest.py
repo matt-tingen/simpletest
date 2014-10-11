@@ -136,13 +136,17 @@ class Test:
 		# Since kwargs is a dict, we can't determine which was listed first in the 
 		# function call so left_name and right_name may be reversed, but it will 
 		# only change which is listed first in the failure output
-		items = list(kwargs.items())
-
 		try:
-			self.left_name, left = items[0]
-			self.right_name, right = items[1]
-		except IndexError:
-			raise TypeError('assert_code takes 1 positional argument and 2 keyword arguments')
+			left = kwargs['left']
+			right = kwargs['right']
+		except KeyError:
+			items = list(kwargs.items())
+
+			try:
+				self.left_name, left = items[0]
+				self.right_name, right = items[1]
+			except IndexError:
+				raise TypeError('assert_code takes 1 positional argument and 2 keyword arguments')
 
 		self._assert_eval(code, left, right)
 
