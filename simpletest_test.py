@@ -1,4 +1,4 @@
-from test import Test, TestFailed
+from simpletest import Test, TestFailed
 
 class TestTest(Test):
 	clear_console_on_assert_success = False
