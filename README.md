@@ -46,7 +46,7 @@ You can use `assert_eval`:
 self.assert_eval('2 * half == whole', half=0.5, whole=1)
 ```
 
-Or you can create a new assert method. When doing so you must use `_assert_op` or `_assert_eval`. Due to the way the calling line is currently determined, you cannot use a public assert in another assert.
+Or you can create a new assert method. When doing so you must use `_assert_op` or `_assert_eval`. Your new method's name __must__ begin with `assert_` or the calling line will cannot be determined correctly.
 
 `_assert_op` takes a left value, a right value, and an operator.
 The following will evaluate `left % right`:

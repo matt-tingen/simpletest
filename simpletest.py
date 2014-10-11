@@ -15,8 +15,8 @@ class Test:
     exit_on_fail = True
     clear_console_on_assert_success = False
     write_failed_assert_to_file = False
-    source_lines_before = 2
-    source_lines_after = 1
+    context_lines_before = 2
+    context_lines_after = 1
     left_name = 'left'
     right_name = 'right'
     separator = '\n' + '=' * 20 + '\n'
@@ -49,21 +49,34 @@ class Test:
             f.write(repr(value))
 
     def get_frame_info(self):
-        frame = inspect.currentframe()
+        for frame, filename, line_num, fn_name, context, line_index in inspect.stack():
+            module_name = inspect.getmodule(frame).__name__
 
-        for _ in range(self.frame_depth):
-            frame = frame.f_back
+            if module_name != 'simpletest' and not fn_name.startswith('assert_'):
+                break
 
-        self.line_num = frame.f_lineno
-        self.filename = frame.f_code.co_filename
-        self.get_source_lines(frame)
+        self.frame = frame
+        self.filename = filename
+        self.line_num = line_num
+        self.fn_name = fn_name
 
-    def get_source_lines(self, frame):
-        source_lines, start_line_num = inspect.getsourcelines(frame)
+        # The inspect module only supports getting context centered around the calling line.
+        # When doing something like
+        # assert_eq(
+        #     left_value,
+        #     right_value
+        # )
+        # the third line (`    right value`) is considered the calling line so we want
+        # two lines before and one after. The get_context method supports this.
+        self.get_context()
+
+    def get_context(self):
+        context, start_line_num = inspect.getsourcelines(self.frame)
         adjusted_line_num = self.line_num - start_line_num
-        start = max(0, adjusted_line_num - self.source_lines_before)
-        end = min(len(source_lines), adjusted_line_num + self.source_lines_after + 1)
-        self.source_lines = ''.join(source_lines[start:end])
+        start = max(0, adjusted_line_num - self.context_lines_before)
+        end = min(len(context), adjusted_line_num + self.context_lines_after + 1)
+
+        self.context = ''.join(context[start:end])
 
     def success(self):
         pass
@@ -99,7 +112,7 @@ class Test:
         print(self.separator)
         print('Expected: ' + self.code)
         print('Test "{}" failed on line {} of\n{}:'.format(self.id, self.line_num, self.filename))
-        print(self.source_lines)
+        print(self.context)
 
     def _assert_fail(self):
             self.get_frame_info()
@@ -115,14 +128,12 @@ class Test:
         pass
         
     def _assert_op(self, left, right, op):
-        self.frame_depth = 4
         self._assert_eval('left ' + op + ' right', left, right)
 
     def _assert_eval(self, code, left, right):
         self.code = code
         self.left = left
         self.right = right
-        self.frame_depth = 4
 
         locals()[self.left_name] = left
         locals()[self.right_name] = right
