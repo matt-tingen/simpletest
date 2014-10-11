@@ -1,8 +1,6 @@
 from simpletest import Test, TestFailed
 
 class TestTest(Test):
-	clear_console_on_assert_success = False
-	write_failed_assert_to_file = False
 
 	def success(self):
 		print('Passed')

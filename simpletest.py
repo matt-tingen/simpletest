@@ -13,13 +13,13 @@ class Test:
 	_id = None
 	pretty_print = True
 	exit_on_fail = True
-	clear_console_on_assert_success = True
-	write_failed_assert_to_file = True
+	clear_console_on_assert_success = False
+	write_failed_assert_to_file = False
 	source_lines_before = 2
 	source_lines_after = 1
 	left_name = 'left'
 	right_name = 'right'
-	divider = '\n' + '=' * 20 + '\n'
+	separator = '\n' + '=' * 20 + '\n'
 
 	def __init__(self, **kwargs):
 		for key, value in kwargs:
@@ -93,10 +93,10 @@ class Test:
 
 		print('\n{}:'.format(self.left_name))
 		pretty_print(self.left)
-		print(self.divider)
+		print(self.separator)
 		print('{}:'.format(self.right_name))
 		pretty_print(self.right)
-		print(self.divider)
+		print(self.separator)
 		print('Expected: ' + self.code)
 		print('Test "{}" failed on line {} of\n{}:'.format(self.id, self.line_num, self.filename))
 		print(self.source_lines)
