@@ -1,6 +1,6 @@
 from simpletest import Test, TestFailed
 
-class TestTest(Test):
+class SimpleTestTest(Test):
 
 	def success(self):
 		print('Passed')
