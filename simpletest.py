@@ -117,15 +117,25 @@ class Test:
     def assert_success(self):
         pass
 
-    def _fail(self):
-        self.fail()
+    def pre_fail(self):
+        pass
 
+    def _fail(self):
+        self.print_fail_summary()
+
+        if self.write_failed_assert_to_file:
+            self.write_value_to_file(self.left, self.failed_file_name('left'))
+            self.write_value_to_file(self.right, self.failed_file_name('right'))
+
+        self.fail()
+        
+    def fail(self):
         if self.exit_on_fail:
             sys.exit()
         else:
             raise TestFailed
 
-    def fail(self):
+    def print_fail_summary(self):
         if self.pretty_print:
             pretty_print = pprint
         else:
@@ -146,18 +156,10 @@ class Test:
         print(self.context)
 
     def _assert_fail(self):
-            self.get_frame_info()
+        self.get_frame_info()
+        self.pre_fail()
+        raise TestFailed
 
-            if self.write_failed_assert_to_file:
-                self.write_value_to_file(self.left, self.failed_file_name('left'))
-                self.write_value_to_file(self.right, self.failed_file_name('right'))
-
-            self.assert_fail()
-            raise TestFailed
-
-    def assert_fail(self):
-        pass
-        
     def _assert_op(self, left, right, op):
         self._assert_eval('left ' + op + ' right', left, right)
 
