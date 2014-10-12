@@ -26,17 +26,43 @@ Is Instance | `assert_instance` | `isinstance(left, right)`
 For Example:
 
 ```python
-from test import Test
+from simpletest import Test
 
 def double(n):
-	return 2 * n
+    return 2 * n
 
-class SampleTest(Test):
+class DoubleTest(Test):
     def run(self):
         self.assert_eq(double(2), 4)
+        self.assert_eq(double(3), 7)
 
-SampleTest()
+DoubleTest()
 ```
+
+The first assert will pass, but the second will fail, printing
+
+```
+
+left:
+6
+
+====================
+
+right:
+7
+
+====================
+
+Expected: left == right
+Test "DoubleTest" failed on line 12 of
+C:\Users\Matt\Dropbox\Programming\Python3\simpletest\_.py:
+   10: def run(self):
+   11:     self.assert_eq(double(2), 4)
+-> 12:     self.assert_eq(double(3), 7)
+
+```
+
+This output can be customized in a number of ways (see the Overriding Behavior section).
 
 ## Custom Asserts
 If you need to test something not covered by the provided asserts, you can do one of two things:
@@ -62,3 +88,51 @@ def assert_half(self, half, whole):
 	self._assert_eval('half == whole / 2', half=half, whole=whole)
 ```
 
+## Overriding Behavior
+
+The behavior of a `Test` can be changed by setting properties and/or overriding methods.
+
+
+### Properties
+#### Actions
+
+Property | Default | Description
+--- | --- | ---
+`exit_on_fail` | `True` | Call `sys.exit()` after a failed assert. If false, the exception `simpletest.TestFailed` will be thrown instead. 
+`clear_console_on_assert_success` | `False` | Clear the console after each successful assert (useful for debugging)
+`write_failed_assert_to_file` | `False` | Write the left and right values to individual files after a failed assert
+
+#### Display
+
+Property | Default | Description
+--- | --- | ---
+`pretty_print` | `True` | Use the `pprint` module to print values in the failure summary
+`id` | class name | The name of the test in the failure summary
+`separator` | `'\n====================\n'` | Separates the left value, right value, and extra info in the failure summary
+`context_lines_before` | `2` | Number of source code lines to display before the line calling the assert 
+`context_lines_after` | `1` | Number of source code lines to display after the line calling the assert
+`context_marker` | `'-> '` | Marks the line calling the failed assert
+`context_divider` | `': '` | Separates line numbers from the corresponding lines
+
+Note: if you call an assert in the following manner, Python considers the third line to be the calling line. This is why the defaults for `context_lines_before` and `context_lines_after` are what they are.
+
+``` python
+assert_eq(
+    left_value,
+    right_value
+)
+```
+
+### Methods
+
+`assert_success` is called when an assert method passes. It is called after the console is cleared when `clear_console_on_assert_success` is `True`.
+
+`success` is called after the entire `Test` has run without any asserts failing.
+
+`pre_fail` is called after an assert fails but before the failure summary is printed and values are written to file (with `write_failed_assert_to_file`). It can be used to change the displayed values `self.left` and `self.right`. Regardless of what changes in the method, the test will still fail.
+
+`print_fail_summary` is the method that displays the failure summary.
+
+`fail` is called after `print_fail_summary` and after the values are written to file (with `write_failed_assert_to_file`). By default, this will exit or raise `simpletest.TestFailed` based on `exit_on_fail`.
+
+`failed_file_name` generates the filenames when using `write_failed_assert_to_file`. It takes one argument (other than `self`) which will be either `left` or `right` which indicates which value's filename to generate. The members `self.left_name` and `self.right_name` are available for use in the filename.
