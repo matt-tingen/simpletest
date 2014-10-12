@@ -56,5 +56,5 @@ class SimpleTestTest(Test):
         else:
             raise AssertionError
 
-TestTest()
+SimpleTestTest()
 
