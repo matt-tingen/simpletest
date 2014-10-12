@@ -1,6 +1,5 @@
 import sys
 import inspect
-from datetime import datetime
 import os
 from pprint import pprint
 import textwrap
