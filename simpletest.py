@@ -106,7 +106,7 @@ class Test:
         self.context = '\n'.join(lines)
 
     def success(self):
-        pass
+        print(self.id + ' passed')
 
     def _assert_success(self):
         if self.clear_console_on_assert_success:

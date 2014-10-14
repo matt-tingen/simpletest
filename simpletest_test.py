@@ -1,10 +1,6 @@
 from simpletest import Test, TestFailed
 
 class SimpleTestTest(Test):
-
-    def success(self):
-        print('Passed')
-
     def run(self):
         self.assert_eq(4, 4)
 

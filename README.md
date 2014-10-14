@@ -127,7 +127,7 @@ assert_eq(
 
 `assert_success` is called when an assert method passes. It is called after the console is cleared when `clear_console_on_assert_success` is `True`.
 
-`success` is called after the entire `Test` has run without any asserts failing.
+`success` is called after the entire `Test` has run without any asserts failing. By default, this print a simple message indicating success.
 
 `pre_fail` is called after an assert fails but before the failure summary is printed and values are written to file (with `write_failed_assert_to_file`). It can be used to change the displayed values `self.left` and `self.right`. Regardless of what changes in the method, the test will still fail.
 
