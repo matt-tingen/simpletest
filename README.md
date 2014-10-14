@@ -101,6 +101,7 @@ Property | Default | Description
 `exit_on_fail` | `True` | Call `sys.exit()` after a failed assert. If false, the exception `simpletest.TestFailed` will be thrown instead. 
 `clear_console_on_assert_success` | `False` | Clear the console after each successful assert (useful for debugging)
 `write_failed_assert_to_file` | `False` | Write the left and right values to individual files after a failed assert
+`make_html_diff` | `False` | Create a file `diff.html` with a line-by-line diff of a failed assert. This option is most useful with `assert_eq` and multi-line strings.
 
 #### Display
 

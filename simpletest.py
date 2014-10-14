@@ -3,6 +3,8 @@ import inspect
 import os
 from pprint import pprint
 import textwrap
+import difflib
+import re
 
 
 class TestFailed(Exception):
@@ -15,6 +17,7 @@ class Test:
     exit_on_fail = True
     clear_console_on_assert_success = False
     write_failed_assert_to_file = False
+    make_html_diff = False
     context_lines_before = 2
     context_lines_after = 1
     left_name = 'left'
@@ -49,6 +52,13 @@ class Test:
     def write_value_to_file(self, value, filename):
         with open(filename, 'w') as f:
             f.write(repr(value))
+
+    def html_diff(self):
+        differ = difflib.HtmlDiff(tabsize=4)
+        left = re.split(r'\r?\n', str(self.left))
+        right = re.split(r'\r?\n', str(self.right))
+
+        return differ.make_file(left, right, fromdesc=self.left_name, todesc=self.right_name)
 
     def get_frame_info(self):
         for frame, filename, line_num, fn_name, context, line_index in inspect.stack():
@@ -126,6 +136,14 @@ class Test:
         if self.write_failed_assert_to_file:
             self.write_value_to_file(self.left, self.failed_file_name('left'))
             self.write_value_to_file(self.right, self.failed_file_name('right'))
+
+        if self.make_html_diff:
+            diff = self.html_diff()
+
+            # Don't use self.write_value_to_file because it uses repr() which
+            # would mess up the HTML
+            with open('diff.html', 'w') as f:
+                f.write(diff)
 
         self.fail()
         
