@@ -2,7 +2,7 @@
 
 simpletest is a simple way to unit test python code.
 
-This project was written largely as an exercise and I couldn't tell you what it offers over the built-in `unittest` module.
+This project was written largely as an exercise. I recommend using [pytest](http://pytest.org/) or the built-in `unittest` module.
 
 ## Usage
 
