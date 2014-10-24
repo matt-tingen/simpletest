@@ -55,7 +55,7 @@ right:
 
 Expected: left == right
 Test "DoubleTest" failed on line 12 of
-C:\Users\Matt\Dropbox\Programming\Python3\simpletest\_.py:
+C:\Users\Matt\Documents\simpletest\double_test.py:
    10: def run(self):
    11:     self.assert_eq(double(2), 4)
 -> 12:     self.assert_eq(double(3), 7)
